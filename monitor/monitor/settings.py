@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'reporter',
     'corsheaders',
     'health_monitor',
     'django.contrib.admin',
