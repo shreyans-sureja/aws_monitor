@@ -1,3 +1,4 @@
+import boto3
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
@@ -12,11 +13,54 @@ class InstanceViewSet(viewsets.ModelViewSet):
     serializer_class = InstanceSerializer
 
     def create(self,request):
-        print(request.data['description'])
-
         x = self.serializer_class(data = request.data)
 
         if x.is_valid():
             self.perform_create(x)
 
-        return HttpResponse("lololol")
+            alrm = create_alarm(request.data)
+
+            if alrm is True:
+                return JsonResponse({"message" : "instance successfully added and alarm created for thresold!"})
+            else:
+                return JsonResponse({"message" : "Unable to create alarm for thresold, please check params again!"})
+        else:
+            return JsonResponse({"message": "invalid request!"})
+
+
+
+def create_alarm(data):
+        instance_id = data['instance_id']
+        region = data['region_name']
+        access_key = data['access_key']
+        secret_access_key = data['secret_access_key']
+        thresold = data['thresold']
+
+        cloudwatch = boto3.client('cloudwatch', region_name=region,aws_access_key_id=access_key,aws_secret_access_key=secret_access_key)
+
+        try:
+            query = cloudwatch.put_metric_alarm(
+                AlarmName='Web_Server_CPU_Utilization',
+                ComparisonOperator='GreaterThanThreshold',
+                EvaluationPeriods=1,
+                MetricName='CPUUtilization',
+                Namespace='AWS/EC2',
+                Period=3600,
+                Statistic='Average',
+                Threshold= float(thresold),
+                ActionsEnabled=True,
+                AlarmDescription='Alarm when server CPU exceeds thresold!',
+                Dimensions=[
+                    {
+                        'Name': 'InstanceId',
+                        'Value': instance_id
+                    },
+                ],
+                Unit='Percent'
+            )
+
+            if query['ResponseMetadata']['HTTPStatusCode'] != 200:
+                return False
+            return True
+        except:
+            return False
