@@ -7,6 +7,7 @@ class instance(models.Model):
     access_key = models.CharField(max_length=500)
     secret_access_key = models.CharField(max_length=500,default="")
     thresold = models.CharField(max_length=5,default="100")
+    time = models.IntegerField(default=3600)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

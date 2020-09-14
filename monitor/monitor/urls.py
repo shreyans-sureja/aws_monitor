@@ -7,3 +7,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('fork/',include('reporter.urls'))
 ]
+
+from reporter.scheduler import start
+
+start(repeat=150)
+# start()

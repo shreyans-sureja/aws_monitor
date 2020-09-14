@@ -19,7 +19,7 @@ def get_metrics(request,id):
     atts = request.data['attributes']
 
     try:
-        instanc = instance.objects.get(instance_id=id)
+        instanc = instance.objects.all().filter(instance_id=id).first()
         response = {}
 
         cloudwatch = boto3.client('cloudwatch', region_name=instanc.region_name,
