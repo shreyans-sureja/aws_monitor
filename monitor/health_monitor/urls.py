@@ -8,4 +8,5 @@ router.register(r'',views.InstanceViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('records/<str:id>/', views.get_data)
 ]

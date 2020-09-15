@@ -3,7 +3,9 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets
 from .models import instance
+from rest_framework.decorators import api_view
 from .serializers import InstanceSerializer
+from reporter.models import records
 
 def index(request):
     return HttpResponse("Hello, world!")
@@ -64,3 +66,22 @@ def create_alarm(data):
             return True
         except:
             return False
+
+@csrf_exempt
+@api_view(['GET'])
+def get_data(request,id):
+
+    response = []
+    try:
+        entries = records.objects.all().filter(instance_id=id)
+        for entry in entries:
+            temp = {}
+            temp['Timestamp'] = entry.timestamp
+            temp['Average'] = entry.avg_usage
+            temp['Maximum'] = entry.max_usage
+            temp['Minimum'] = entry.min_usage
+            response.append(temp)
+
+        return JsonResponse({"InstanceId" : id , "datapoints" : response})
+    except:
+        return JsonResponse({"message" : "Invalid request!"})

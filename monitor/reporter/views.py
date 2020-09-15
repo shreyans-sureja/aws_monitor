@@ -55,7 +55,7 @@ def get_metrics(request,id):
 def get_metadata(request,id):
 
     try:
-        instanc = instance.objects.get(instance_id=id)
+        instanc = instance.objects.all().filter(instance_id=id).first()
         response = {}
 
         ec2 = boto3.resource('ec2', region_name=instanc.region_name,
