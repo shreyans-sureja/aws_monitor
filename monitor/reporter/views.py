@@ -67,7 +67,7 @@ def get_metadata(request,id):
 
         response["instance-id"] = inst.id
         response["instance-type"] = inst.instance_type
-        response["public-ipv4"] = inst.instance_id
+        response["public-ipv4"] = inst.public_ip_address
         response["hostname"] = inst.root_device_name
 
         client = boto3.client('ec2', region_name=instanc.region_name,
